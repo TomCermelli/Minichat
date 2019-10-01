@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link type="text/css" rel="stylesheet" href="mini_chat.css">
+    <title>mini_chat</title>
+  </head>
+  <header>
+    <h1>Mini Chat</h1>
+  </header>
+  <body>
+      <div class="chat">
+        <form action="mini_chat.php" method="post">
+          <p>
+          <label>Pseudo</label> :<input name="pseudo" type="text" name="pseudo" value="" required>
+          </p>
+          <p>
+          <label>Message</label> :<textarea class="envoiMessage" type="text" name="message" value=""required></textarea>
+          </p>
+          <input id="bouton" class="envoiInput"type="submit" name="envoyer" value="Envoyer" >
+        </form>
+      </div>
+      <hr>
+      <div class=affichage>
+        <?php
+          try {
+            $mini_chat= new PDO('mysql:host=localhost;dbname=mini_chat;charset=utf8', 'root', 'ADRAR1112', array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+          }
+          catch (Exception $e)
+          {
+          die('Erreur : '.$e->getMessage());
+          }
+          if (isset($_POST["pseudo"]) && isset($_POST["message"])){
+          $envoi= $mini_chat->prepare('INSERT INTO mini_chat(pseudo, message) VALUES (?, ?)');
+          $envoi->execute(array( htmlspecialchars($_POST['pseudo']), htmlspecialchars($_POST['message'])));
+          };
+          $affichage= $mini_chat->query('SELECT pseudo, message FROM mini_chat ORDER BY id_pseudo DESC LIMIT 10');
+          while ($donnee = $affichage->fetch())
+          {
+            echo "<strong>".$donnee['pseudo']."</strong>"." : ".$donnee['message']. "<br/>";
+          }
+          $affichage->closeCursor();
+          ?>
+      </div>
+  </body>
+</html>
